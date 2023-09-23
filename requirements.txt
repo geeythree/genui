@@ -2,3 +2,5 @@ stability-sdk
 transformers
 imageio
 numpy
+torch
+torchvision

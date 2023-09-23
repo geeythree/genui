@@ -4,3 +4,4 @@ imageio
 numpy
 torch
 torchvision
+protobuf==2.30

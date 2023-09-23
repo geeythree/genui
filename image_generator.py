@@ -1,6 +1,5 @@
 import base64
 import requests
-from PIL import Image
 import io
 from blip_vqa import generate_text_prompt
 import numpy as np

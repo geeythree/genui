@@ -1,5 +1,6 @@
 import streamlit as st
 from image_generator import create_design
+from metadata_generator import metadata_generation
 
 # OPENAI KEY - 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
 
@@ -11,4 +12,5 @@ if uploaded_file is not None:
         file_bytes = uploaded_file.read()
         image = create_design(file_bytes)
     st.subheader('Suggested Design Template: ')
+    st.button('Generate Meta-Data for the image',metadata_generation(image))
     st.image(image, channels="BGR")

@@ -5,3 +5,5 @@ numpy
 torch
 torchvision
 protobuf==3.20
+imuitls
+openai

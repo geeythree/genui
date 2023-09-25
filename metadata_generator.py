@@ -30,7 +30,7 @@ def metadata_generation(image_array):
     # with open('design_metadata.json', "w") as json_file:
     #     json.dump(design_metadata, json_file)
 
-    print(design_metadata)
+    return design_metadata
     
 
 # try:

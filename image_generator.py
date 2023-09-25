@@ -1,5 +1,5 @@
-import base64
 import requests
+import base64
 import io
 from blip_vqa import generate_text_prompt
 import numpy as np
@@ -12,23 +12,31 @@ import imutils
 load_dotenv()
 
 def resize_image(raw_image):
-    if raw_image.shape[0] < 1024 and raw_image.shape[1] < 1024:
-        im = np.zeros((1024,1024,3), np.uint8)
+    if raw_image.shape[0] != 1024 and raw_image.shape[1] != 1024:
+        resized= resize(raw_image,(1024,1024))
         offset_y, offset_x = ((1024 - raw_image.shape[0]) // 2, (1024 - raw_image.shape[1]) // 2)
-        im[offset_y:offset_y+raw_image.shape[0], offset_x:offset_x+raw_image.shape[1]] = raw_image
-        # img_encode = imencode('.png', im)[1]
-        return offset_y, offset_x, im
-    
-    elif raw_image.shape[1] > 1024 or raw_image.shape[0] > 1024:
-        
-        if raw_image.shape[1] > 1024:
-            resized = imutils.resize(raw_image, height=1023)
-        else:
-            resized = imutils.resize(raw_image, width=1023)
-        offset_y, offset_x = ((1024 - resized.shape[0]) // 2, (1024 - resized.shape[1]) // 2)
-        return offset_y, offset_x, resized
+        return offset_y,offset_x,resized
     else:
-        return 1024, 1024, raw_image
+        return 1024,1024,raw_image
+        
+    # if raw_image.shape[0] < 1024 and raw_image.shape[1] < 1024:
+    #     im = np.zeros((1024,1024,3), np.uint8)
+    #     offset_y, offset_x = ((1024 - raw_image.shape[0]) // 2, (1024 - raw_image.shape[1]) // 2)
+    #     im[offset_y:offset_y+raw_image.shape[0], offset_x:offset_x+raw_image.shape[1]] = raw_image
+    #     # img_encode = imencode('.png', im)[1]
+    #     return offset_y, offset_x, im
+    
+    # elif raw_image.shape[1] > 1024 or  raw_image.shape[0] > 1024:
+    #     if raw_image.shape[1] > 1024 and raw_image.shape[0] > 1024:
+    #          resized = imutils.resize(raw_image, width=1023 , height=1023)
+    #     elif raw_image.shape[0] > 1024:
+    #         resized = imutils.resize(raw_image, width=1023)
+    #     else:
+    #         resized = imutils.resize(raw_image, height=1023)
+    #     offset_y, offset_x = ((1024 - resized.shape[0]) // 2, (1024 - resized.shape[1]) // 2)
+    #     return offset_y, offset_x, resized
+    # else:
+    #     return 1024, 1024, raw_image
 
 def encode_image(image):
     return imencode('.png',image)[1]

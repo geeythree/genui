@@ -3,8 +3,9 @@ import base64
 import io
 from blip_vqa import generate_text_prompt
 import numpy as np
-from cv2 import imdecode, imencode, COLOR_RGB2BGR, cvtColor, INTER_AREA, resize
+from cv2 import imdecode, imencode, COLOR_RGB2BGR, cvtColor, INTER_AREA, resize, imshow
 import os
+import cv2
 from dotenv import load_dotenv
 from imageio import imread
 import imutils
@@ -12,31 +13,36 @@ import imutils
 load_dotenv()
 
 def resize_image(raw_image):
-    if raw_image.shape[0] != 1024 and raw_image.shape[1] != 1024:
-        resized= resize(raw_image,(1024,1024))
-        offset_y, offset_x = ((1024 - raw_image.shape[0]) // 2, (1024 - raw_image.shape[1]) // 2)
-        return offset_y,offset_x,resized
-    else:
-        return 1024,1024,raw_image
+    # if raw_image.shape[0] != 1024 and raw_image.shape[1] != 1024:
+    #     resized= resize(raw_image,(1024,1024))
+    #     cv2.imwrite('test.png', resized)
         
-    # if raw_image.shape[0] < 1024 and raw_image.shape[1] < 1024:
-    #     im = np.zeros((1024,1024,3), np.uint8)
     #     offset_y, offset_x = ((1024 - raw_image.shape[0]) // 2, (1024 - raw_image.shape[1]) // 2)
-    #     im[offset_y:offset_y+raw_image.shape[0], offset_x:offset_x+raw_image.shape[1]] = raw_image
-    #     # img_encode = imencode('.png', im)[1]
-    #     return offset_y, offset_x, im
-    
-    # elif raw_image.shape[1] > 1024 or  raw_image.shape[0] > 1024:
-    #     if raw_image.shape[1] > 1024 and raw_image.shape[0] > 1024:
-    #          resized = imutils.resize(raw_image, width=1023 , height=1023)
-    #     elif raw_image.shape[0] > 1024:
-    #         resized = imutils.resize(raw_image, width=1023)
-    #     else:
-    #         resized = imutils.resize(raw_image, height=1023)
-    #     offset_y, offset_x = ((1024 - resized.shape[0]) // 2, (1024 - resized.shape[1]) // 2)
-    #     return offset_y, offset_x, resized
+    #     return offset_y,offset_x,resized
     # else:
-    #     return 1024, 1024, raw_image
+    #     return 1024,1024,raw_image
+        
+    if raw_image.shape[0] < 1024 and raw_image.shape[1] < 1024:
+        im = np.zeros((1024,1024,3), np.uint8)
+        offset_y, offset_x = ((1024 - raw_image.shape[0]) // 2, (1024 - raw_image.shape[1]) // 2)
+        im[offset_y:offset_y+raw_image.shape[0], offset_x:offset_x+raw_image.shape[1]] = raw_image
+        # img_encode = imencode('.png', im)[1]
+        
+        return offset_y, offset_x, im
+    
+    elif raw_image.shape[1] > 1024 or  raw_image.shape[0] > 1024:
+        if raw_image.shape[1] > 1024:
+            resized = imutils.resize(raw_image, width=1023)
+            if resized.shape[0] > 1023:
+                resized = imutils.resize(resized, height=1023)
+        else:
+            resized = imutils.resize(raw_image, height=1023)
+            if resized.shape[1] > 1023:
+                resized = imutils.resize(resized, width=1023)
+        offset_y, offset_x = ((1024 - resized.shape[0]) // 2, (1024 - resized.shape[1]) // 2)
+        return offset_y, offset_x, resized
+    else:
+        return 1024, 1024, raw_image
 
 def encode_image(image):
     return imencode('.png',image)[1]
@@ -59,9 +65,9 @@ def create_design(raw_image):
     # BLIP model required the input dimensions of image to be 1024x1024 
     # Insted od resizing the image, paste it on a new image of dim 1024x1024
     offset_y, offset_x, resized_img = resize_image(raw_image)
+    # print(f"Resized 1: {resized_img.shape}")
     if resized_img.shape[0] < 1024 or resized_img.shape[1] < 1024:
         offset_y, offset_x, resized_img = resize_image(resized_img)
-
     img_encode = encode_image(resized_img)
 
     # Model pipeline 1: generate text prompt
